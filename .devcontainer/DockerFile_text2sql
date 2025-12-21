@@ -1,0 +1,55 @@
+FROM python:3.12-slim
+
+# Install git
+RUN apt-get update &&  \
+    apt-get install -y \
+    sudo \
+    ca-certificates \
+    git \
+    curl \
+    gpg \
+    unixodbc-dev && \
+    apt-get -y clean && \
+    rm -rf /var/lib/apt/lists/*
+
+
+RUN cd /tmp && \
+    curl -sSL -O https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb
+RUN apt-get update
+RUN ACCEPT_EULA=Y apt-get install -y msodbcsql18
+RUN apt-get -y clean 
+RUN rm -rf /var/lib/apt/lists/*
+
+# Set separate working directory for easier debugging.
+WORKDIR /app
+
+# Add custom CAs (for GlobalProtect SIG)
+COPY ./.devcontainer/certificates/* /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+
+# Create virtual environment.
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# Install Python Packages. 
+RUN pip install --upgrade certifi
+COPY ./.devcontainer/requirements.txt /tmp/
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Add custom CAs (for GlobalProtect SIG) to Python environment.
+RUN ls /usr/local/share/ca-certificates/*  | xargs cat >> $(python -m certifi)
+
+# adsjust user and group id to match host.
+ARG REMOTE_USER
+ARG UID
+ARG GID
+
+RUN groupadd --gid ${GID} ${REMOTE_USER}
+RUN useradd --uid ${UID} --gid ${GID} -s /bin/bash -m ${REMOTE_USER}
+RUN echo ${REMOTE_USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${REMOTE_USER} \
+    && chmod 0440 /etc/sudoers.d/${REMOTE_USER}
+
+USER ${REMOTE_USER}
+
+WORKDIR /workspace/text2sql

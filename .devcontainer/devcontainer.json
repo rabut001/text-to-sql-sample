@@ -1,0 +1,23 @@
+{
+    "name": "text2sql",
+    "remoteUser": "vscode",
+    "updateRemoteUserUID": false,
+    "dockerComposeFile": [
+        "compose.yml"
+    ],
+    "service": "text2sql",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.pylint",
+                "ms-python.debugpy"
+            ],
+            "settings": {
+                "dev.containers.executeInWSL": true,
+                "pylint.enabled":true
+            }
+        }
+    },
+    "workspaceFolder": "/workspace/text2sql",
+    "shutdownAction": "stopCompose"
+}

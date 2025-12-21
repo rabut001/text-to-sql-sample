@@ -1,0 +1,49 @@
+name: devcontainer
+services:
+  text2sql-sqlsvr:
+    user: root
+    build:
+      context: .
+      dockerfile: DockerFile_sqlsvr
+    image: text2sql-sqlsvr
+    container_name: text2sql-sqlsvr
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=6v@lu@t!0n_X
+      - MSSQL_PID=Developer
+      - MSSQL_LCID=1041
+      - MSSQL_COLLATION=Japanese_XJIS_100_CS_AS_KS_WS
+    tty: true
+    restart: always
+    volumes:
+      - "initdb_volume:/docker-entrypoint-initdb.d"
+      - "data_volume:/var/opt/mssql/data"
+      - "log_volume:/var/opt/mssql/log"
+      - "secrets_volume:/var/opt/mssql/secrets"
+  text2sql:
+    container_name: text2sql
+    depends_on:
+      - text2sql-sqlsvr
+    build:
+      context: ..
+      dockerfile: .devcontainer/DockerFile_text2sql
+      args:
+        REMOTE_USER: vscode
+        UID: 1000
+        GID: 1000
+    image: text2sql
+    ports:
+      - 8501:8501
+    environment:
+      - CONNECTION_STRING=Encrypt=No;TrustServerCertificate=No;DRIVER={ODBC Driver 18 for SQL Server};Server=text2sql-sqlsvr,1433;Database=AdventureWorks;Uid=sa;Pwd=6v@lu@t!0n_X;
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ../:/workspace/text2sql:rw
+    tty: true
+volumes:
+  initdb_volume:
+  data_volume:
+  log_volume:
+  secrets_volume:
