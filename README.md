@@ -24,4 +24,4 @@ OPENAI_API_KEY=add-your-api-key-here
 
 ## Running the Application
 
-To start the Streamlit application, run `streamlit run text-to-sql-bedrock.py`
+To start the Streamlit application, run `streamlit run text-to-sql-sample.py`
