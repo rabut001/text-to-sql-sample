@@ -14,4 +14,9 @@ done
 echo "Restore the database if it does not exist..."
 sqlcmd  -S localhost -i restore.sql -U sa -P $MSSQL_SA_PASSWORD -N o > restore.log
 
+# add read only user
+echo "Adding read only user..."
+sqlcmd  -S localhost -i add_readonly_user.sql -U sa -P $MSSQL_SA_PASSWORD -N o > add_readonly_user.log
+
+
 wait

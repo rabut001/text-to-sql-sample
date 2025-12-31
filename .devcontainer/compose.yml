@@ -36,8 +36,19 @@ services:
     image: text2sql
     ports:
       - 8501:8501
+    healthcheck:
+      # wait for SQL Server to be ready
+      test: [
+        "CMD-SHELL",
+        "sqlcmd -S text2sql-sqlsvr -U text2sql -P 6v@lu@t!0n_X -Q \"SELECT 1\" || exit 1"
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
     environment:
-      - CONNECTION_STRING=Encrypt=No;TrustServerCertificate=No;DRIVER={ODBC Driver 18 for SQL Server};Server=text2sql-sqlsvr,1433;Database=AdventureWorks;Uid=sa;Pwd=6v@lu@t!0n_X;
+      - CONNECTION_STRING=Encrypt=No;TrustServerCertificate=No;DRIVER={ODBC Driver 18 for SQL Server};Server=text2sql-sqlsvr,1433;Database=AdventureWorks;Uid=text2sql;Pwd=6v@lu@t!0n_X;
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     volumes:
       - ../:/workspace/text2sql:rw
