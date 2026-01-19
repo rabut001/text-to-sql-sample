@@ -1,10 +1,13 @@
+-- the top 3 lines (including this line) will be replaced with actual password by entrypoint.sh
+:setvar TEXT2SQL_PASSWORD "Password1234!"
+
 USE master;
 GO
 
 -- Create login for text2sql user with SQL Server authentication if it does not exist
 IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = 'text2sql')
 BEGIN
-    CREATE LOGIN text2sql WITH PASSWORD = '6v@lu@t!0n_X';
+    CREATE LOGIN text2sql WITH PASSWORD = '$(TEXT2SQL_PASSWORD)';
 END
 GO
 

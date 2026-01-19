@@ -1,4 +1,4 @@
-name: devcontainer
+name: text2sql_devcontainer
 services:
   text2sql-sqlsvr:
     user: root
@@ -15,6 +15,9 @@ services:
       - MSSQL_PID=Developer
       - MSSQL_LCID=1041
       - MSSQL_COLLATION=Japanese_XJIS_100_CS_AS_KS_WS
+      - TEXT2SQL_PASSWORD=6v@lu@t!0n_X
+    healthcheck:
+      test: [ "CMD-SHELL", "/docker-entrypoint-initdb.d/healthcheck.sh" ]
     tty: true
     restart: always
     volumes:
@@ -25,7 +28,8 @@ services:
   text2sql:
     container_name: text2sql
     depends_on:
-      - text2sql-sqlsvr
+      text2sql-sqlsvr:
+        condition: service_healthy
     build:
       context: ..
       dockerfile: .devcontainer/DockerFile_text2sql
@@ -36,17 +40,6 @@ services:
     image: text2sql
     ports:
       - 8501:8501
-    healthcheck:
-      # wait for SQL Server to be ready
-      test: [
-        "CMD-SHELL",
-        "sqlcmd -S text2sql-sqlsvr -U text2sql -P 6v@lu@t!0n_X -Q \"SELECT 1\" || exit 1"
-      ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 5s
-
     environment:
       - CONNECTION_STRING=Encrypt=No;TrustServerCertificate=No;DRIVER={ODBC Driver 18 for SQL Server};Server=text2sql-sqlsvr,1433;Database=AdventureWorks;Uid=text2sql;Pwd=6v@lu@t!0n_X;
       - OPENAI_API_KEY=${OPENAI_API_KEY}

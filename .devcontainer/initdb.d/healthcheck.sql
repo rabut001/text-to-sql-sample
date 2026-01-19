@@ -1,0 +1,1 @@
+select state_desc from sys.databases where name='AdventureWorks';
