@@ -17,7 +17,7 @@ The main differences from the original are as follows.
 
 ## Setup
 
-Set your OpenAI API key in the file .env:
+Set your OpenAI API key in the file .devcontainer/.env:
 ```
 OPENAI_API_KEY=add-your-api-key-here
 ```
