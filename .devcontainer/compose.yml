@@ -19,7 +19,6 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "/docker-entrypoint-initdb.d/healthcheck.sh" ]
     tty: true
-    restart: always
     volumes:
       - "initdb_volume:/docker-entrypoint-initdb.d"
       - "data_volume:/var/opt/mssql/data"
